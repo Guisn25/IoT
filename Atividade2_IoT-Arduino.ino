@@ -2,13 +2,23 @@
 DHT dht(2, DHT11);
 
 int LDR[5] = {0};
-float mediaLDR;
 int LM35[5] = {0};
-float mediaLM35;
 float DHTtemp[5] = {0};
-float mediaDHTtemp;
 float DHThum[5] = {0};
-float mediaDHTHum;
+
+typedef struct Svalor{
+  float mediaLDR;
+  float mediaLM35;
+  float mediaDHTtemp;
+  float mediaDHThum;
+}Tvalor;
+
+typedef union Uvalor{
+  Tvalor valor;
+  byte bytesValor[sizeof(Tvalor)];
+}TBytes;
+
+TBytes Dados;
 
 bool sensor = 0;
 int escolhaSensor;
@@ -29,18 +39,18 @@ void loop(){
     DHTtemp[0] = dht.readTemperature();
     DHThum[0] = dht.readHumidity();
   
-    mediaLDR = (LDR[0] + LDR[1] + LDR[2] + LDR[3] + LDR[4])/5;
-    mediaLM35 = (LM35[0] + LM35[1] + LM35[2] + LM35[3] + LM35[4])/5;
-    mediaDHTtemp = (DHTtemp[0] + DHTtemp[1] + DHTtemp[2] + DHTtemp[3] + DHTtemp[4])/5;
-    mediaDHTHum = (DHThum[0] + DHThum[1] + DHThum[2] + DHThum[3] + DHThum[4])/5;
+    Dados.valor.mediaLDR = (LDR[0] + LDR[1] + LDR[2] + LDR[3] + LDR[4])/5;
+    Dados.valor.mediaLM35 = (LM35[0] + LM35[1] + LM35[2] + LM35[3] + LM35[4])/5;
+    Dados.valor.mediaDHTtemp = (DHTtemp[0] + DHTtemp[1] + DHTtemp[2] + DHTtemp[3] + DHTtemp[4])/5;
+    Dados.valor.mediaDHThum = (DHThum[0] + DHThum[1] + DHThum[2] + DHThum[3] + DHThum[4])/5;
     
-    mediaLM35 = mediaLM35 * 0.48875855327;
-    if(mediaLDR > 250){
-      Serial2.write(-1);
+    Dados.valor.mediaLM35 = Dados.valor.mediaLM35 * 0.48875855327;
+    if(Dados.valor.mediaLDR > 250){
+      Serial2.write('A');
     }
 
-    if(mediaLM35 > 30 || mediaDHTtemp > 30){
-      Serial.write(-2);
+    if(Dados.valor.mediaLM35 > 27 || Dados.valor.mediaDHTtemp > 30){
+      Serial2.write('B');
     }
 
     for(int i=4;i>0;i--){
@@ -51,9 +61,13 @@ void loop(){
     }
     T = millis();
   }
-  
-  Serial.println(mediaLDR);
-
+  for(int i=0; i<4; i++){
+   Serial.print(Dados.valor.mediaLM35);
+   Serial.print("\t");
+   Serial2.write(Dados.bytesValor[i+4]);
+  }
+  Serial.println();
+  /*
   if(!sensor){
     if(Serial2.available()){
       escolhaSensor = Serial2.parseInt();
@@ -68,7 +82,9 @@ void loop(){
             sensor = 0;
           }
           if(escolhaDado == 1){
-            Serial2.write(mediaLM35);
+            for(int i=0; i<4; i++){
+              Serial2.write(Dados.bytesValor[i]);
+            }
           }
         }
       break;
@@ -80,7 +96,7 @@ void loop(){
             sensor = 0;
           }
           if(escolhaDado == 1){
-            Serial2.write(mediaLDR);
+            Serial2.write(Dados.bytesValor[i+4]);
           }
         }
       break;
@@ -92,13 +108,14 @@ void loop(){
             sensor = 0;
           }
           if(escolhaDado == 1){
-            Serial2.write(mediaDHTtemp);
+            Serial2.write(Dados.bytesValor[i+8]);
           }
           if(escolhaDado == 2){
-            Serial2.write(mediaDHThum);
+            Serial2.write(Dados.bytesValor[i+12]);
           }
         }
       break;
     }
   }
+  */
 }
