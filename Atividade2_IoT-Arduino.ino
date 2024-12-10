@@ -49,7 +49,7 @@ void loop(){
       Serial2.write('A');
     }
 
-    if(Dados.valor.mediaLM35 > 27 || Dados.valor.mediaDHTtemp > 30){
+    if(Dados.valor.mediaLM35 > 27 || Dados.valor.mediaDHTtemp > 27){
       Serial2.write('B');
     }
 
@@ -61,61 +61,57 @@ void loop(){
     }
     T = millis();
   }
-  for(int i=0; i<4; i++){
-   Serial.print(Dados.valor.mediaLM35);
-   Serial.print("\t");
-   Serial2.write(Dados.bytesValor[i+4]);
-  }
-  Serial.println();
-  /*
+  
   if(!sensor){
     if(Serial2.available()){
-      escolhaSensor = Serial2.parseInt();
+      escolhaSensor = Serial2.read();
       sensor = 1;
+      Serial.println(escolhaSensor);
     }
   }else{
     switch(escolhaSensor){
-      case 1:
+      case 49:
         if(Serial2.available()){
-          escolhaDado = Serial2.parseInt();
-          if(escolhaDado == 2){
+          escolhaDado = Serial2.read();
+          if(escolhaDado == 50){
             sensor = 0;
           }
-          if(escolhaDado == 1){
-            for(int i=0; i<4; i++){
-              Serial2.write(Dados.bytesValor[i]);
-            }
+          if(escolhaDado == 49){
+            Serial2.write(&Dados.bytesValor[0], 4);
+            sensor = 0;
           }
         }
       break;
 
-      case 2;
+      case 50:
         if(Serial2.available()){
-          escolhaDado = Serial2.parseInt();
-          if(escolhaDado == 2){
+          escolhaDado = Serial2.read();
+          if(escolhaDado == 50){
             sensor = 0;
           }
-          if(escolhaDado == 1){
-            Serial2.write(Dados.bytesValor[i+4]);
+          if(escolhaDado == 49){
+            Serial2.write(&Dados.bytesValor[4], 4);
+            sensor = 0;
           }
         }
       break;
 
-      case 3:
+      case 51:
         if(Serial2.available()){
-          escolhaDado = Serial2.parseInt();
-          if(escolhaDado == 3){
+          escolhaDado = Serial2.read();
+          if(escolhaDado == 51){
             sensor = 0;
           }
-          if(escolhaDado == 1){
-            Serial2.write(Dados.bytesValor[i+8]);
+          if(escolhaDado == 49){
+            Serial2.write(&Dados.bytesValor[8], 4);
+            sensor = 0;
           }
-          if(escolhaDado == 2){
-            Serial2.write(Dados.bytesValor[i+12]);
+          if(escolhaDado == 50){
+            Serial2.write(&Dados.bytesValor[12], 4);
+            sensor = 0;
           }
         }
       break;
     }
   }
-  */
 }
