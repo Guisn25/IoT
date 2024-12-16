@@ -1,3 +1,6 @@
+// Guilherme Silva do Nascimento 156554
+// Atividade 2 com envio de múltiplos bytes via UART
+
 #include "DHT.h"
 DHT dht(2, DHT11);
 
@@ -7,8 +10,8 @@ float DHTtemp[5] = {0};
 float DHThum[5] = {0};
 
 typedef struct Svalor{
-  float mediaLDR;
   float mediaLM35;
+  float mediaLDR;
   float mediaDHTtemp;
   float mediaDHThum;
 }Tvalor;
@@ -45,13 +48,6 @@ void loop(){
     Dados.valor.mediaDHThum = (DHThum[0] + DHThum[1] + DHThum[2] + DHThum[3] + DHThum[4])/5;
     
     Dados.valor.mediaLM35 = Dados.valor.mediaLM35 * 0.48875855327;
-    if(Dados.valor.mediaLDR > 250){
-      Serial2.write('A');
-    }
-
-    if(Dados.valor.mediaLM35 > 27 || Dados.valor.mediaDHTtemp > 27){
-      Serial2.write('B');
-    }
 
     for(int i=4;i>0;i--){
       LDR[i] = LDR[i-1];
@@ -62,11 +58,18 @@ void loop(){
     T = millis();
   }
   
+  if(Dados.valor.mediaLDR > 250){
+    Serial2.write('A');
+  }
+
+  if(Dados.valor.mediaLM35 > 25 || Dados.valor.mediaDHTtemp > 25){
+    Serial2.write('B');
+  }
+  
   if(!sensor){
     if(Serial2.available()){
       escolhaSensor = Serial2.read();
       sensor = 1;
-      Serial.println(escolhaSensor);
     }
   }else{
     switch(escolhaSensor){
